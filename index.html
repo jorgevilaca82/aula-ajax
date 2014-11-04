@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Ajax - Carrega poemas</title>
+</head>
+<body>
+	
+	<ul>
+		<li>
+			<a  href="#" 
+				class="poema" 
+				data-poema="o-cego-e-a-guitarra">
+			
+				O cego e a guitarra
+			</a>
+		</li>
+		<li>
+			<a  href="#" 
+				class="poema" 
+				data-poema="todas-as-cartas-de-amor">
+			
+				Todas as cartas de amor
+			</a>
+		</li>
+		<li>
+			<a  href="#" 
+				class="poema" 
+				data-poema="poema-da-destruicao">
+			
+				Poema da destruição
+			</a>
+		</li>
+	</ul>
+
+	<div id="poema">
+		
+	</div>
+
+</body>
+<script>
+
+// Função AJAX que carrega um poema por vez,
+// recebe como paramentro o identificador do poema
+// que tambem representa parte do nome do arquivo remoto
+// que contem o poema
+function carregaPoemaAjax(poema) {
+	
+	// inicialização do objeto que possibilita as requisições assíncronas
+	var xmlhttp;
+	if (window.XMLHttpRequest) { // code for IE7+, Firefox, Chrome, Opera, Safari
+		xmlhttp = new XMLHttpRequest();
+	}
+	else { // code for IE6, IE5
+		xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	
+	// códigos do xmlhttp.readyState
+	// -----------------------------
+	// 0: request not initialized 
+	// 1: server connection established
+	// 2: request received 
+	// 3: processing request 
+	// 4: request finished and response is ready
+
+	// adiciona o evento "onreadystatechange" ao objeto de requisições assíncronas
+	// este evento é disparado toda vez que o estado da requisição é alterado, veja
+	// acima os códigos que o "estado de pronto" ou "readyState" pode assumir.
+	// só será disparado após acionarmos o método send().
+	xmlhttp.onreadystatechange = function() {
+		
+		// quando estiver "processando a requisição" exibe a mensagem "Aguarde"
+		if (xmlhttp.readyState == 3) {
+			document.getElementById("poema").innerHTML = "Aguarde...";
+		}
+
+		// quando a requisição estiver finalizada e código de status da requisição for 200 (OK)
+		// insere no documento o conteúdo texto da resposta
+		if (xmlhttp.readyState == 4 && xmlhttp.status == 200) { 
+			setTimeout(function(){}, 3000);// simular delay
+			document.getElementById("poema").innerHTML = xmlhttp.responseText;					
+		}
+
+		// quando a requisição estiver finalizada e código de status da requisição for 404 (NÃO ENCNTRADO)
+		// informa que o poema não foi encontrado
+		if (xmlhttp.readyState == 4 && xmlhttp.status == 404) {
+			document.getElementById("poema").innerHTML = "Poema não encontrado! ";
+		}
+
+	}
+
+	// cria a URL da requisição, que representa o caminho do arquivo do poema
+	var url = "poemas/" + poema + ".html";
+
+	// abre a requisição com método GET e informando o endereço (URL) que deve ser requisitado
+	// e o último parametro informa que a requisição é assícrona
+	xmlhttp.open("GET", url, true);
+	
+	// envia a solicitação, a partir daqui e em consequência das respostas, é que o evento
+	// onreadystatechange será disparado.
+	xmlhttp.send();
+}
+
+// Adiciona o evento DOMContentLoaded ao documento,
+// este evento é disparado no momento que o conteúdo do documento
+// é carregado por completo, garantindo que todos os elementos 
+// que são manipulados dentro da função já tenham sido carregados
+document.addEventListener("DOMContentLoaded", function(){ 
+
+	// obtem todos os links de poema do documento
+	var poemaLinks = document.querySelectorAll('.poema');
+
+	// faz uma iteração sobre os links de poema adicionando
+	// dinamicamente a cada um o evento de click que irá
+	// carregar o poema via ajax
+	for (var i = poemaLinks.length - 1; i >= 0; i--) {
+		poemaLinks[i].addEventListener('click', function (event) {
+			event.preventDefault();
+			// acessa os atributos especiais prefixados com "data-"
+			var poema = this.dataset.poema;
+			// carrega o poema
+			carregaPoemaAjax(poema);
+		});
+	};
+});
+
+// Referência
+// http://www.w3schools.com/ajax/ajax_xmlhttprequest_send.asp
+</script>
+</html>
